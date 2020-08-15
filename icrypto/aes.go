@@ -4,14 +4,12 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"fmt"
 	"io"
-	"io/ioutil"
-	"os"
 )
 
-func encrypt(data []byte, passphrase string) []byte {
-	block, _ := aes.NewCipher([]byte(createMD5Hash(passphrase)))
+//AESEncrypt This function is used to encrypt a string with AES
+func AESEncrypt(data []byte, passphrase string) []byte {
+	block, _ := aes.NewCipher([]byte(MD5Hash(passphrase)))
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		panic(err.Error())
@@ -24,8 +22,9 @@ func encrypt(data []byte, passphrase string) []byte {
 	return ciphertext
 }
 
-func decrypt(data []byte, passphrase string) []byte {
-	key := []byte(createMD5Hash(passphrase))
+//AESDecrypt This function uses aes to decrypt a string
+func AESDecrypt(data []byte, passphrase string) []byte {
+	key := []byte(MD5Hash(passphrase))
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err.Error())
@@ -41,25 +40,4 @@ func decrypt(data []byte, passphrase string) []byte {
 		panic(err.Error())
 	}
 	return plaintext
-}
-
-func encryptFile(filename string, data []byte, passphrase string) {
-	f, _ := os.Create(filename)
-	defer f.Close()
-	f.Write(encrypt(data, passphrase))
-}
-
-func decryptFile(filename string, passphrase string) []byte {
-	data, _ := ioutil.ReadFile(filename)
-	return decrypt(data, passphrase)
-}
-
-func main() {
-	fmt.Println("Starting the application...")
-	ciphertext := encrypt([]byte("Hello World"), "password")
-	fmt.Printf("Encrypted: %x\n", ciphertext)
-	plaintext := decrypt(ciphertext, "password")
-	fmt.Printf("Decrypted: %s\n", plaintext)
-	encryptFile("sample.txt", []byte("Hello World"), "password1")
-	fmt.Println(string(decryptFile("sample.txt", "password1")))
 }
