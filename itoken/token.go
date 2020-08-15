@@ -21,16 +21,20 @@ func EncryptToken(tstruct interface{}) string {
 
 //DecryptToken Used to decrypt token
 func DecryptToken(eString string, tPtr interface{}) error {
-	return DecryptTokenWithKey(eString, key, tPtr)
+	err := DecryptTokenWithKey(eString, key, tPtr)
+	// fmt.Println(tPtr)
+	return err
 }
 
 //EncryptTokenWithKey Used to generate Token
 func EncryptTokenWithKey(tstruct interface{}, key string) string {
+	// fmt.Println(tstruct)
 	data, err := json.Marshal(tstruct)
 	if err != nil {
 		fmt.Println("Error ", err)
 		return ""
 	}
+	// fmt.Println(data)
 	eData := icrypto.AESEncrypt(data, key)
 	return string(eData)
 }
@@ -39,7 +43,9 @@ func EncryptTokenWithKey(tstruct interface{}, key string) string {
 func DecryptTokenWithKey(eString string, key string, tPtr interface{}) error {
 	data := []byte(eString)
 	dData := icrypto.AESDecrypt(data, key)
+	// fmt.Println(dData)
 	err := json.Unmarshal(dData, tPtr)
+	// fmt.Println(tPtr)
 	if err != nil {
 		fmt.Println("Error ", err)
 		return err
