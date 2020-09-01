@@ -1,6 +1,7 @@
 package itoken
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
@@ -36,15 +37,18 @@ func EncryptTokenWithKey(tstruct interface{}, key string) string {
 	}
 	// fmt.Println(data)
 	eData := icrypto.AESEncrypt(data, key)
-	return string(eData)
+	return hex.EncodeToString(eData)
 }
 
 //DecryptTokenWithKey Used to decrypt token
 func DecryptTokenWithKey(eString string, key string, tPtr interface{}) error {
-	data := []byte(eString)
+	data, err := hex.DecodeString(eString)
+	if err != nil {
+		return err
+	}
 	dData := icrypto.AESDecrypt(data, key)
 	// fmt.Println(dData)
-	err := json.Unmarshal(dData, tPtr)
+	err = json.Unmarshal(dData, tPtr)
 	// fmt.Println(tPtr)
 	if err != nil {
 		fmt.Println("Error ", err)
